@@ -145,6 +145,11 @@ float INA219::readShuntCurrent(void)
     return (readRegister16(INA219_REG_CURRENT) * currentLSB);
 }
 
+float INA219::readShuntCurrentRepeat(void)
+{
+    return (readRegister16() * currentLSB);
+}
+
 float INA219::readShuntVoltage(void)
 {
     float voltage;
@@ -159,6 +164,16 @@ float INA219::readBusVoltage(void)
     int16_t voltage;
 
     voltage = readRegister16(INA219_REG_BUSVOLTAGE);
+    voltage >>= 3;
+
+    return (voltage * 0.004);
+}
+
+float INA219::readBusVoltageRepeat(void)
+{
+    int16_t voltage;
+
+    voltage = readRegister16();
     voltage >>= 3;
 
     return (voltage * 0.004);
@@ -231,6 +246,27 @@ int16_t INA219::readRegister16(uint8_t reg)
     Wire.endTransmission();
 
     delay(1);
+
+    Wire.beginTransmission(inaAddress);
+    Wire.requestFrom(inaAddress, 2);
+    while(!Wire.available()) {};
+    #if ARDUINO >= 100
+        uint8_t vha = Wire.read();
+        uint8_t vla = Wire.read();
+    #else
+        uint8_t vha = Wire.receive();
+        uint8_t vla = Wire.receive();
+    #endif;
+    Wire.endTransmission();
+
+    value = vha << 8 | vla;
+
+    return value;
+}
+
+int16_t INA219::readRegister16()
+{
+    int16_t value;
 
     Wire.beginTransmission(inaAddress);
     Wire.requestFrom(inaAddress, 2);

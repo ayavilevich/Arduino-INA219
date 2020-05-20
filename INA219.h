@@ -107,6 +107,9 @@ class INA219
 	float readBusPower(void);
 	float readBusVoltage(void);
 
+	float readShuntCurrentRepeat(void);
+    float readBusVoltageRepeat(void);
+
 	float getMaxPossibleCurrent(void);
 	float getMaxCurrent(void);
 	float getMaxShuntVoltage(void);
@@ -120,6 +123,7 @@ class INA219
 
 	void writeRegister16(uint8_t reg, uint16_t val);
 	int16_t readRegister16(uint8_t reg);
+    int16_t readRegister16();
 };
 
 #endif
